@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:crypto_font_icons/crypto_font_icons.dart';
+import 'package:coingecko_api/coingecko_api.dart';
 
 void main() => runApp(MaterialApp(
   home: HomePage(),
@@ -11,7 +13,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _index = 2;
-
+  CoinGeckoApi api = CoinGeckoApi();
   @override
   Widget build(BuildContext context) {
     final List _titles = [
@@ -26,6 +28,46 @@ class _HomePageState extends State<HomePage> {
       "Earn FREE Crypto while exploring Blockchain",
       "Try Bank Transfer via SEPA",
     ];
+
+    final _coinsInfo = [
+      {
+        'name' : 'Bitcoin',
+        'short' : 'BTC',
+        'val' : 19239.82,
+        'percentage' : -0.81,
+      },
+      {
+        'name' : 'Ethereum',
+        'short' : 'ETH',
+        'val' : 1325.91,
+        'percentage' : 0.40,
+      },
+      {
+        'name' : 'BNB',
+        'short' : 'BNB',
+        'val' : 281.00,
+        'percentage' : 1.04,
+      },
+      {
+        'name' : 'TetherUS',
+        'short' : 'USDT',
+        'val' : 1.01,
+        'percentage' : -1.12,
+      },
+      {
+        'name' : 'Ripple',
+        'short' : 'ETH',
+        'val' : 0.4312,
+        'percentage' : -1.12,
+      },
+      {
+        'name' : 'Solana',
+        'short' : 'SOL',
+        'val' : 33.66,
+        'percentage' : 2.16,
+      },
+    ];
+
     List<Widget> _pages = <Widget>[
       Scaffold(
         backgroundColor: Color(0xff202630),
@@ -89,15 +131,62 @@ class _HomePageState extends State<HomePage> {
                   return HelpCards(title: _titles[index], subtitle: _subtitles[index],);
                 },
                   scrollDirection: Axis.horizontal,
-                  physics: PageScrollPhysics(),),
+                  physics: PageScrollPhysics(),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.fromLTRB(20,10,10,0),
+                  child: Stack(children: <Widget>[
+                    Align(
+                    alignment: Alignment.centerLeft,
+                    child:Text('Coin',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                ),
+                      ],
+                ),
+                      ),
+              Container(
+                padding: EdgeInsets.fromLTRB(10,0,10,0),
+                height: 310,
+                width: double.maxFinite,
+                color: Colors.transparent,
+                child: ListView.builder(itemCount: _coinsInfo.length, itemBuilder: (context, index){
+                  return Coins(name:((_coinsInfo[index])['name']).toString(), short:((_coinsInfo[index])['short']).toString(), val:double.parse(((_coinsInfo[index])['val']).toString()), percent:double.parse((_coinsInfo[index])['percentage'].toString()),);
+                },
+                  physics: PageScrollPhysics(),
+                ),
               ),
             ],
           ),
         ),
       ),
-      Icon(
-        Icons.chat,
-        size: 150,
+      Scaffold(
+        backgroundColor: Color(0xff202630),
+        body: Container(
+          child: Align(
+            alignment: Alignment.center,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.amberAccent,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0)),
+              minimumSize: Size(150, 40),
+            ),
+            onPressed: () {},
+            child: Text('Buy Crypto with KES',
+              style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+    ),
+        ),
       ),
       Scaffold(
         backgroundColor: Color(0xff202630),
@@ -116,7 +205,7 @@ class _HomePageState extends State<HomePage> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 200),
+                SizedBox(height: 230),
                 Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget> [
@@ -202,10 +291,9 @@ class HelpCards extends StatelessWidget {
   final String title, subtitle;
 
   HelpCards({required this.title, required this.subtitle});
-  
+
   @override
   Widget build(BuildContext context) {
-
     return Container(
       width: 370.0,
       child: Card(
@@ -227,7 +315,6 @@ class HelpCards extends StatelessWidget {
               Text(subtitle,
                 style: TextStyle(
                   color: Colors.white70,
-//fontWeight: FontWeight.bold,
                   fontSize: 10,
                 ),
               ),
@@ -236,6 +323,73 @@ class HelpCards extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class Coins extends StatelessWidget {
+  final String name, short;
+  final double val, percent;
+
+  Coins({required this.name, required this.short, required this.val, required this.percent, });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Card(
+        color: Color(0xff202630),
+        child: Padding(
+          padding: EdgeInsets.all(10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    Icon(
+                      CryptoFontIcons.BTC,
+                      size: 20,
+                      ),
+                    SizedBox(width: 20),
+                    Text(name,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                    ),
+                    SizedBox(width: 20),
+                    Text(short,
+                      style: TextStyle(
+                        color: Colors.white60,
+                        fontSize: 14,
+                      ),
+                    ),
+                    ],
+              ),
+              SizedBox(width: 80),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: <Widget>[
+                  Text("\$$val",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                    ),
+                  ),
+                  Text("$percent%",
+                    style: TextStyle(
+                      color: percent>0 ? Colors.green : Colors.red,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              )
+              ],
+      ),
+    ),
+    ),
+  );
   }
 }
 
