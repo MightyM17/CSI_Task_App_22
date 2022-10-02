@@ -3,6 +3,7 @@ import 'package:crypto_font_icons/crypto_font_icons.dart';
 import 'package:coingecko_api/coingecko_api.dart';
 
 void main() => runApp(MaterialApp(
+  debugShowCheckedModeBanner: false,
   home: HomePage(),
 ));
 
@@ -14,8 +15,24 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _index = 2;
   CoinGeckoApi api = CoinGeckoApi();
+
+  Future<void> _getCoinData() async
+  {
+    final api = CoinGeckoApi();
+    final result = await api.coins.listCoins();
+    if (!result.isError) {
+        print('listCoins() results:');
+        result.data.forEach(
+        (item) => print(
+          'name= ${item.name}, sym = ${item.symbol}'),
+        );
+    }
+    //return result.data.forEach((item) => item.name); Returns void??
+  }
+
   @override
   Widget build(BuildContext context) {
+    _getCoinData(); //Prints data successfully
     final List _titles = [
       "Beginner's Guide",
       "Earn",
@@ -68,14 +85,25 @@ class _HomePageState extends State<HomePage> {
       },
     ];
 
+    /* Use Images as icons instead of depending on CryptoFontIcons */
+    List<IconData> icons = [
+      CryptoFontIcons.BTC,
+      CryptoFontIcons.ETH,
+      CryptoFontIcons.BTC,
+      CryptoFontIcons.ETH,
+      CryptoFontIcons.BTC,
+      CryptoFontIcons.ETH,
+    ];
+
     List<Widget> _pages = <Widget>[
       Scaffold(
         backgroundColor: Color(0xff202630),
         body: Center(
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget> [
-              SizedBox(height: 60),
-              Image.asset(("assets/Binance.png"),
+              SizedBox(height: 10),
+              Image.asset(("assets/Binance_ss.png"),
                   height: 100,
                   width: 100),
               SizedBox(height: 20),
@@ -156,7 +184,7 @@ class _HomePageState extends State<HomePage> {
                 width: double.maxFinite,
                 color: Colors.transparent,
                 child: ListView.builder(itemCount: _coinsInfo.length, itemBuilder: (context, index){
-                  return Coins(name:((_coinsInfo[index])['name']).toString(), short:((_coinsInfo[index])['short']).toString(), val:double.parse(((_coinsInfo[index])['val']).toString()), percent:double.parse((_coinsInfo[index])['percentage'].toString()),);
+                  return Coins(name:((_coinsInfo[index])['name']).toString(), short:((_coinsInfo[index])['short']).toString(), val:double.parse(((_coinsInfo[index])['val']).toString()), percent:double.parse((_coinsInfo[index])['percentage'].toString()), coinIcon:icons[index]);
                 },
                   physics: PageScrollPhysics(),
                 ),
@@ -193,8 +221,8 @@ class _HomePageState extends State<HomePage> {
         body: Center(
           child: Column(
               children: <Widget> [
-                SizedBox(height: 300),
-                Image.asset(("assets/Binance.png"),
+                SizedBox(height: 250),
+                Image.asset(("assets/Binance_ss.png"),
                     height: 100,
                     width: 100),
                 SizedBox(height: 20),
@@ -329,8 +357,8 @@ class HelpCards extends StatelessWidget {
 class Coins extends StatelessWidget {
   final String name, short;
   final double val, percent;
-
-  Coins({required this.name, required this.short, required this.val, required this.percent, });
+  final IconData coinIcon;
+  Coins({required this.name, required this.short, required this.val, required this.percent, required this.coinIcon});
 
   @override
   Widget build(BuildContext context) {
@@ -346,7 +374,8 @@ class Coins extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: <Widget>[
                     Icon(
-                      CryptoFontIcons.BTC,
+                      //CryptoFontIcons.BTC,
+                      coinIcon,
                       size: 20,
                       ),
                     SizedBox(width: 20),
